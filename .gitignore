@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# IDE/Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Application Data (Don't commit real data!)
+data/*.json
+!data/.keep
+
+# Environment variables (if any, though currently config.py is used)
+.env
