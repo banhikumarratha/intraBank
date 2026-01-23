@@ -37,18 +37,17 @@ def record_contribution():
     data = request.get_json()
     
     # Validate input
-    required_fields = ['group_id', 'amount', 'duration_days']
+    required_fields = ['group_id', 'amount']
     if not data or not all(k in data for k in required_fields):
         return jsonify({
             'success': False,
-            'message': 'Group ID, amount, and duration are required'
+            'message': 'Group ID and amount are required'
         }), 400
     
     result = contribution_service.record_contribution(
         user_id=user_id,
         group_id=data['group_id'],
-        amount=data['amount'],
-        duration_days=data['duration_days']
+        amount=data['amount']
     )
     
     status_code = 201 if result['success'] else 400

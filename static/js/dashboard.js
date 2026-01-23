@@ -112,7 +112,7 @@ async function renderDashboard() {
                                     <div>
                                         <div style="font-weight: 600;">${formatCurrency(contrib.amount)}</div>
                                         <div style="font-size: 0.875rem; color: var(--text-muted);">
-                                            ${contrib.duration_days} days • ${formatDate(contrib.timestamp)}
+                                            ${formatDate(contrib.timestamp)}
                                         </div>
                                     </div>
                                 </div>

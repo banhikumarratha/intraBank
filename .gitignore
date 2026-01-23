@@ -19,3 +19,7 @@ data/*.json
 
 # Environment variables (if any, though currently config.py is used)
 .env
+
+# Others
+Frontend/
+

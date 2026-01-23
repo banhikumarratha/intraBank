@@ -29,8 +29,7 @@ class ContributionService:
         self,
         user_id: str,
         group_id: str,
-        amount: float,
-        duration_days: int
+        amount: float
     ) -> Dict[str, Any]:
         """
         Record a member's contribution to a group.
@@ -39,7 +38,6 @@ class ContributionService:
             user_id: User making the contribution
             group_id: Group receiving the contribution
             amount: Contribution amount
-            duration_days: How long funds will stay deposited
             
         Returns:
             Dictionary with success status and contribution data
@@ -74,23 +72,15 @@ class ContributionService:
                 'message': 'Amount must be positive'
             }
         
-        # Validate duration
-        if duration_days <= 0:
-            return {
-                'success': False,
-                'message': 'Duration must be positive'
-            }
-        
         # Generate contribution ID
         contribution_id = f"contrib_{datetime.now().timestamp()}".replace('.', '_')
         
-        # Create contribution record
+        # Create contribution record (timestamp will be used to calculate duration)
         contribution = {
             'id': contribution_id,
             'user_id': user_id,
             'group_id': group_id,
             'amount': amount,
-            'duration_days': duration_days,
             'timestamp': datetime.now().isoformat()
         }
         

@@ -110,7 +110,7 @@ class LoanService:
             'duration_days': duration_days,
             'interest_rate': group['interest_rate'],
             'status': 'pending',
-            'admin_approvals': [],
+            'admin_approved_by': None,  # Track which admin approved
             'member_votes': {},
             'requested_at': datetime.now().isoformat(),
             'approved_at': None,
@@ -170,8 +170,8 @@ class LoanService:
                 'message': 'Only admins can approve loans'
             }
         
-        # Approve the loan
-        return self._approve_loan(loan_id)
+        # Approve the loan and record admin
+        return self._approve_loan(loan_id, admin_id=admin_id)
     
     def member_vote(self, loan_id: str, user_id: str, approve: bool) -> Dict[str, Any]:
         """
@@ -243,12 +243,13 @@ class LoanService:
                 'status': 'pending'
             }
     
-    def _approve_loan(self, loan_id: str) -> Dict[str, Any]:
+    def _approve_loan(self, loan_id: str, admin_id: str = None) -> Dict[str, Any]:
         """
         Internal method to approve a loan and deduct from group balance.
         
         Args:
             loan_id: Loan identifier
+            admin_id: Optional admin ID who approved (for admin approval tracking)
             
         Returns:
             Dictionary with success status
@@ -271,6 +272,10 @@ class LoanService:
         loan['approved_at'] = datetime.now().isoformat()
         due_date = datetime.now() + timedelta(days=loan['duration_days'])
         loan['due_date'] = due_date.isoformat()
+        
+        # Record who approved (if admin approval)
+        if admin_id:
+            loan['admin_approved_by'] = admin_id
         
         # Deduct from group balance
         group['balance'] -= loan['amount']

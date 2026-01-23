@@ -1,7 +1,3 @@
-/**
- * Contributions Page
- * Record and view contributions
- */
 
 async function renderContributionsPage() {
     const app = document.getElementById('app');
@@ -18,8 +14,10 @@ async function renderContributionsPage() {
     const contributions = contributionsResult.success ? contributionsResult.contributions : [];
 
     const totalAmount = contributions.reduce((sum, c) => sum + c.amount, 0);
+
+    // Calculate average days active from timestamps
     const avgDuration = contributions.length > 0
-        ? contributions.reduce((sum, c) => sum + c.duration_days, 0) / contributions.length
+        ? contributions.reduce((sum, c) => sum + calculateDaysActive(c.timestamp), 0) / contributions.length
         : 0;
 
     app.innerHTML = `
@@ -49,7 +47,7 @@ async function renderContributionsPage() {
             </div>
             <div class="stat-card">
                 <div class="stat-value">${avgDuration.toFixed(0)} days</div>
-                <div class="stat-label">Avg Duration</div>
+                <div class="stat-label">Avg Days Active</div>
             </div>
         </div>
         
@@ -84,7 +82,7 @@ async function renderContributionsPage() {
                                 <th>Date</th>
                                 <th>Group</th>
                                 <th>Amount</th>
-                                <th>Duration</th>
+                                <th>Days Active</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,7 +93,7 @@ async function renderContributionsPage() {
                                         <td>${formatDate(contrib.timestamp)}</td>
                                         <td>${group ? group.name : 'Unknown'}</td>
                                         <td style="font-weight: 600; color: var(--success);">${formatCurrency(contrib.amount)}</td>
-                                        <td>${contrib.duration_days} days</td>
+                                        <td>${calculateDaysActive(contrib.timestamp)} days</td>
                                     </tr>
                                 `;
     }).join('')}
@@ -103,7 +101,7 @@ async function renderContributionsPage() {
                     </table>
                 </div>
             </div>
-        `}
+    `}
     `;
 }
 
@@ -139,12 +137,6 @@ function showContributeModal() {
                         <input type="number" step="0.01" class="form-input" name="amount" placeholder="100.00" min="0.01" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Duration (days)</label>
-                        <input type="number" class="form-input" name="duration_days" placeholder="30" min="1" required>
-                        <small style="color: var(--text-muted);">How long will you keep this deposit?</small>
-                    </div>
-                    
                     <div class="flex gap-2">
                         <button type="submit" class="btn btn-primary">Contribute</button>
                         <button type="button" class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
@@ -165,8 +157,7 @@ async function handleContribute(event) {
 
     const result = await api.post('/contributions', {
         group_id: formData.get('group_id'),
-        amount: parseFloat(formData.get('amount')),
-        duration_days: parseInt(formData.get('duration_days'))
+        amount: parseFloat(formData.get('amount'))
     });
 
     if (result.success) {
@@ -184,4 +175,12 @@ async function handleContribute(event) {
     } else {
         showAlert(result.message, 'error');
     }
+}
+
+function calculateDaysActive(timestamp) {
+    const depositDate = new Date(timestamp);
+    const now = new Date();
+    const diffTime = Math.abs(now - depositDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
 }

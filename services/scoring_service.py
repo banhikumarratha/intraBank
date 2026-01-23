@@ -26,6 +26,7 @@ class ScoringService:
         Calculate a user's score based on their contributions.
         
         Formula: Score = (Total Amount × 0.6) + (Avg Duration × 0.4)
+        Duration is calculated from the deposit date to today.
         
         Args:
             user_id: User identifier
@@ -44,8 +45,18 @@ class ScoringService:
         # Calculate total amount
         total_amount = sum(c['amount'] for c in user_contributions)
         
-        # Calculate average duration
-        total_duration = sum(c['duration_days'] for c in user_contributions)
+        # Calculate average duration (days since deposit)
+        from datetime import datetime
+        now = datetime.now()
+        total_duration = 0
+        
+        for contribution in user_contributions:
+            # Parse contribution timestamp
+            contrib_date = datetime.fromisoformat(contribution['timestamp'])
+            # Calculate days since deposit
+            days_active = (now - contrib_date).days
+            total_duration += days_active
+        
         avg_duration = total_duration / len(user_contributions)
         
         # Apply scoring formula

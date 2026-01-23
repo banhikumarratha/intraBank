@@ -1,7 +1,3 @@
-/**
- * Authentication Pages
- * Login and Registration UI
- */
 
 function renderLoginPage() {
     return `

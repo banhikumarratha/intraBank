@@ -1,7 +1,3 @@
-/**
- * Main Application Controller
- * Handles routing, API communication, and authentication state
- */
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -202,9 +198,47 @@ function formatDate(dateString) {
     });
 }
 
-// Format currency
+// Detect user's currency based on browser locale
+function getUserCurrency() {
+    const locale = navigator.language || 'en-IN';
+
+    // Map common locales to currency symbols
+    const currencyMap = {
+        'en-IN': '₹',  // India
+        'hi-IN': '₹',  // India (Hindi)
+        'en-US': '$',  // United States
+        'en-GB': '£',  // United Kingdom
+        'en-EU': '€',  // Europe
+        'de-DE': '€',  // Germany
+        'fr-FR': '€',  // France
+        'ja-JP': '¥',  // Japan
+        'zh-CN': '¥',  // China
+    };
+
+    // Check if locale matches
+    if (currencyMap[locale]) {
+        return currencyMap[locale];
+    }
+
+    // Check country code (last 2 characters)
+    const parts = locale.split('-');
+    if (parts.length > 1) {
+        const country = parts[1];
+        if (country === 'IN') return '₹';
+        if (country === 'US') return '$';
+        if (country === 'GB') return '£';
+        if (country === 'EU' || country === 'DE' || country === 'FR') return '€';
+        if (country === 'JP' || country === 'CN') return '¥';
+    }
+
+    // Default to rupee (₹) since user is in India
+    return '₹';
+}
+
+// Format currency with dynamic symbol
 function formatCurrency(amount) {
-    return `$${amount.toFixed(2)}`;
+    const symbol = '₹'//getUserCurrency();
+    return `${symbol}${amount.toFixed(2)}`;
 }
 
 // Initialize on load
