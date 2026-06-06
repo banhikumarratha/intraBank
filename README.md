@@ -105,7 +105,7 @@ project/
 
 1. **Clone or navigate to the project directory:**
 ```bash
-cd /Users/banhi/Desktop/project
+cd /<path to project>
 ```
 
 2. **Install dependencies:**
